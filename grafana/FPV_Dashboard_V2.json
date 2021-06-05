@@ -1,0 +1,662 @@
+{
+   "annotations": {
+     "list": [
+       {
+         "builtIn": 1,
+         "datasource": "-- Grafana --",
+         "enable": true,
+         "hide": true,
+         "iconColor": "rgba(0, 211, 255, 1)",
+         "limit": 100,
+         "name": "Annotations & Alerts",
+         "showIn": 0,
+         "type": "dashboard"
+       }
+     ]
+   },
+   "editable": true,
+   "gnetId": null,
+   "graphTooltip": 0,
+   "id": 10,
+   "iteration": 1622931076814,
+   "links": [],
+   "panels": [
+     {
+       "aliasColors": {},
+       "bars": false,
+       "dashLength": 10,
+       "dashes": false,
+       "datasource": null,
+       "fieldConfig": {
+         "defaults": {
+           "custom": {}
+         },
+         "overrides": []
+       },
+       "fill": 1,
+       "fillGradient": 0,
+       "gridPos": {
+         "h": 8,
+         "w": 12,
+         "x": 0,
+         "y": 0
+       },
+       "hiddenSeries": false,
+       "id": 12,
+       "legend": {
+         "avg": false,
+         "current": false,
+         "max": false,
+         "min": false,
+         "show": true,
+         "total": false,
+         "values": false
+       },
+       "lines": true,
+       "linewidth": 1,
+       "nullPointMode": "null",
+       "options": {
+         "alertThreshold": true
+       },
+       "percentage": false,
+       "pluginVersion": "7.2.0",
+       "pointradius": 2,
+       "points": false,
+       "renderer": "flot",
+       "seriesOverrides": [],
+       "spaceLength": 10,
+       "stack": false,
+       "steppedLine": false,
+       "targets": [
+         {
+           "groupBy": [
+             {
+               "params": [
+                 "$__interval"
+               ],
+               "type": "time"
+             },
+             {
+               "params": [
+                 "null"
+               ],
+               "type": "fill"
+             }
+           ],
+           "orderByTime": "ASC",
+           "policy": "default",
+           "refId": "A",
+           "resultFormat": "time_series",
+           "select": [
+             [
+               {
+                 "params": [
+                   "value"
+                 ],
+                 "type": "field"
+               },
+               {
+                 "params": [],
+                 "type": "mean"
+               }
+             ]
+           ],
+           "tags": []
+         }
+       ],
+       "thresholds": [],
+       "timeFrom": null,
+       "timeRegions": [],
+       "timeShift": null,
+       "title": "Panel Title",
+       "tooltip": {
+         "shared": true,
+         "sort": 0,
+         "value_type": "individual"
+       },
+       "type": "graph",
+       "xaxis": {
+         "buckets": null,
+         "mode": "time",
+         "name": null,
+         "show": true,
+         "values": []
+       },
+       "yaxes": [
+         {
+           "format": "short",
+           "label": null,
+           "logBase": 1,
+           "max": null,
+           "min": null,
+           "show": true
+         },
+         {
+           "format": "short",
+           "label": null,
+           "logBase": 1,
+           "max": null,
+           "min": null,
+           "show": true
+         }
+       ],
+       "yaxis": {
+         "align": false,
+         "alignLevel": null
+       }
+     },
+     {
+       "datasource": "InfluxDBFPV",
+       "fieldConfig": {
+         "defaults": {
+           "custom": {},
+           "decimals": 1,
+           "mappings": [],
+           "thresholds": {
+             "mode": "absolute",
+             "steps": [
+               {
+                 "color": "green",
+                 "value": null
+               }
+             ]
+           }
+         },
+         "overrides": []
+       },
+       "gridPos": {
+         "h": 8,
+         "w": 23,
+         "x": 0,
+         "y": 8
+       },
+       "id": 10,
+       "options": {
+         "displayMode": "lcd",
+         "orientation": "horizontal",
+         "reduceOptions": {
+           "calcs": [
+             "mean"
+           ],
+           "fields": "",
+           "values": false
+         },
+         "showUnfilled": true
+       },
+       "pluginVersion": "7.2.0",
+       "targets": [
+         {
+           "groupBy": [
+             {
+               "params": [
+                 "model"
+               ],
+               "type": "tag"
+             },
+             {
+               "params": [
+                 "t_freq"
+               ],
+               "type": "tag"
+             },
+             {
+               "params": [
+                 "t_mW"
+               ],
+               "type": "tag"
+             }
+           ],
+           "measurement": "vtx",
+           "orderByTime": "DESC",
+           "policy": "default",
+           "refId": "A",
+           "resultFormat": "time_series",
+           "select": [
+             [
+               {
+                 "params": [
+                   "mW"
+                 ],
+                 "type": "field"
+               },
+               {
+                 "params": [
+                   "mW"
+                 ],
+                 "type": "alias"
+               }
+             ],
+             [
+               {
+                 "params": [
+                   "dBm"
+                 ],
+                 "type": "field"
+               },
+               {
+                 "params": [
+                   "dBm"
+                 ],
+                 "type": "alias"
+               }
+             ],
+             [
+               {
+                 "params": [
+                   "mW"
+                 ],
+                 "type": "field"
+               }
+             ]
+           ],
+           "tags": [
+             {
+               "key": "test",
+               "operator": "=",
+               "value": "20210605_1622898943"
+             },
+             {
+               "condition": "AND",
+               "key": "t_mW",
+               "operator": "=~",
+               "value": "/^$t_mW_list$/"
+             },
+             {
+               "condition": "AND",
+               "key": "model",
+               "operator": "=~",
+               "value": "/^$Vtx_list$/"
+             }
+           ]
+         }
+       ],
+       "timeFrom": null,
+       "timeShift": null,
+       "title": "Panel Title",
+       "type": "bargauge"
+     },
+     {
+       "datasource": "InfluxDBFPV",
+       "fieldConfig": {
+         "defaults": {
+           "custom": {},
+           "decimals": 1,
+           "mappings": [],
+           "thresholds": {
+             "mode": "absolute",
+             "steps": [
+               {
+                 "color": "green",
+                 "value": null
+               }
+             ]
+           },
+           "unit": "dBm"
+         },
+         "overrides": []
+       },
+       "gridPos": {
+         "h": 7,
+         "w": 19,
+         "x": 0,
+         "y": 16
+       },
+       "id": 7,
+       "options": {
+         "colorMode": "value",
+         "graphMode": "none",
+         "justifyMode": "auto",
+         "orientation": "auto",
+         "reduceOptions": {
+           "calcs": [
+             "mean"
+           ],
+           "fields": "",
+           "values": false
+         },
+         "textMode": "value_and_name"
+       },
+       "pluginVersion": "7.2.0",
+       "targets": [
+         {
+           "groupBy": [
+             {
+               "params": [
+                 "model"
+               ],
+               "type": "tag"
+             },
+             {
+               "params": [
+                 "t_freq"
+               ],
+               "type": "tag"
+             },
+             {
+               "params": [
+                 "t_mW"
+               ],
+               "type": "tag"
+             }
+           ],
+           "measurement": "vtx",
+           "orderByTime": "ASC",
+           "policy": "default",
+           "refId": "A",
+           "resultFormat": "time_series",
+           "select": [
+             [
+               {
+                 "params": [
+                   "dBm"
+                 ],
+                 "type": "field"
+               },
+               {
+                 "params": [
+                   "mW"
+                 ],
+                 "type": "alias"
+               }
+             ]
+           ],
+           "tags": [
+             {
+               "key": "test",
+               "operator": "=",
+               "value": "20210605_1622898943"
+             },
+             {
+               "condition": "AND",
+               "key": "t_mW",
+               "operator": "=~",
+               "value": "/^$t_mW_list$/"
+             }
+           ]
+         }
+       ],
+       "timeFrom": null,
+       "timeShift": null,
+       "title": "Auswertung VTX Über Frequenz & Power dBm",
+       "type": "stat"
+     },
+     {
+       "datasource": "InfluxDBFPV",
+       "fieldConfig": {
+         "defaults": {
+           "custom": {},
+           "decimals": 1,
+           "mappings": [],
+           "thresholds": {
+             "mode": "absolute",
+             "steps": [
+               {
+                 "color": "green",
+                 "value": null
+               }
+             ]
+           },
+           "unit": "mwatt"
+         },
+         "overrides": []
+       },
+       "gridPos": {
+         "h": 7,
+         "w": 19,
+         "x": 0,
+         "y": 23
+       },
+       "id": 8,
+       "options": {
+         "colorMode": "value",
+         "graphMode": "none",
+         "justifyMode": "auto",
+         "orientation": "auto",
+         "reduceOptions": {
+           "calcs": [
+             "mean"
+           ],
+           "fields": "",
+           "values": false
+         },
+         "textMode": "value_and_name"
+       },
+       "pluginVersion": "7.2.0",
+       "targets": [
+         {
+           "groupBy": [
+             {
+               "params": [
+                 "model"
+               ],
+               "type": "tag"
+             },
+             {
+               "params": [
+                 "t_freq"
+               ],
+               "type": "tag"
+             },
+             {
+               "params": [
+                 "t_mW"
+               ],
+               "type": "tag"
+             }
+           ],
+           "measurement": "vtx",
+           "orderByTime": "ASC",
+           "policy": "default",
+           "refId": "A",
+           "resultFormat": "time_series",
+           "select": [
+             [
+               {
+                 "params": [
+                   "mW"
+                 ],
+                 "type": "field"
+               },
+               {
+                 "params": [
+                   "mW"
+                 ],
+                 "type": "alias"
+               }
+             ]
+           ],
+           "tags": [
+             {
+               "key": "test",
+               "operator": "=",
+               "value": "20210605_1622898943"
+             },
+             {
+               "condition": "AND",
+               "key": "t_mW",
+               "operator": "=~",
+               "value": "/^$t_mW_list$/"
+             }
+           ]
+         }
+       ],
+       "timeFrom": null,
+       "timeShift": null,
+       "title": "Auswertung VTX Über Frequenz & Power in mW",
+       "type": "stat"
+     }
+   ],
+   "schemaVersion": 26,
+   "style": "dark",
+   "tags": [],
+   "templating": {
+     "list": [
+       {
+         "allValue": null,
+         "current": {
+           "selected": true,
+           "text": "200.00",
+           "value": "200.00"
+         },
+         "hide": 0,
+         "includeAll": false,
+         "label": "Angegebene Ausgangsleistung in mW",
+         "multi": false,
+         "name": "t_mW_list",
+         "options": [
+           {
+             "selected": true,
+             "text": "25.00",
+             "value": "25.00"
+           },
+           {
+             "selected": false,
+             "text": "50.00",
+             "value": "50.00"
+           },
+           {
+             "selected": false,
+             "text": "100.00",
+             "value": "100.00"
+           },
+           {
+             "selected": false,
+             "text": "200.00",
+             "value": "200.00"
+           },
+           {
+             "selected": false,
+             "text": "300.00",
+             "value": "300.00"
+           },
+           {
+             "selected": false,
+             "text": "400.00",
+             "value": "400.00"
+           },
+           {
+             "selected": false,
+             "text": "600.00",
+             "value": "600.00"
+           },
+           {
+             "selected": false,
+             "text": "800.00",
+             "value": "800.00"
+           }
+         ],
+         "query": "25.00, 50.00, 100.00, 200.00,300.00,400.00,600.00,800.00",
+         "queryValue": "",
+         "skipUrlSync": false,
+         "type": "custom"
+       },
+       {
+         "allValue": null,
+         "current": {
+           "selected": false,
+           "text": "5600",
+           "value": "5600"
+         },
+         "hide": 2,
+         "includeAll": true,
+         "label": "Eingestellte Frequenz",
+         "multi": false,
+         "name": "freq_list",
+         "options": [
+           {
+             "selected": false,
+             "text": "All",
+             "value": "$__all"
+           },
+           {
+             "selected": false,
+             "text": "5600",
+             "value": "5600"
+           },
+           {
+             "selected": false,
+             "text": "5650",
+             "value": "5650"
+           },
+           {
+             "selected": false,
+             "text": "5700",
+             "value": "5700"
+           },
+           {
+             "selected": false,
+             "text": "5750",
+             "value": "5750"
+           },
+           {
+             "selected": false,
+             "text": "5800",
+             "value": "5800"
+           },
+           {
+             "selected": true,
+             "text": "5850",
+             "value": "5850"
+           },
+           {
+             "selected": false,
+             "text": "5900",
+             "value": "5900"
+           },
+           {
+             "selected": false,
+             "text": "5950",
+             "value": "5950"
+           },
+           {
+             "selected": false,
+             "text": "6000",
+             "value": "6000"
+           }
+         ],
+         "query": "5600,5650,5700,5750,5800,5850,5900,5950,6000",
+         "queryValue": "",
+         "skipUrlSync": false,
+         "type": "custom"
+       },
+       {
+         "allValue": null,
+         "current": {
+           "selected": false,
+           "text": "Eachine_TX805",
+           "value": "Eachine_TX805"
+         },
+         "hide": 0,
+         "includeAll": false,
+         "label": "VTX",
+         "multi": false,
+         "name": "Vtx_list",
+         "options": [
+           {
+             "selected": true,
+             "text": "Eachine_TX805",
+             "value": "Eachine_TX805"
+           },
+           {
+             "selected": false,
+             "text": "MINI_VTX_5848",
+             "value": "MINI_VTX_5848"
+           }
+         ],
+         "query": "Eachine_TX805, MINI_VTX_5848",
+         "queryValue": "",
+         "skipUrlSync": false,
+         "type": "custom"
+       }
+     ]
+   },
+   "time": {
+     "from": "now-6h",
+     "to": "now"
+   },
+   "timepicker": {},
+   "timezone": "",
+   "title": "FPV_VTX_Dashboard_V2",
+   "uid": "DQgt1F6Gk",
+   "version": 11
+ }

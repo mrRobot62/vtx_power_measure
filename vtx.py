@@ -16,13 +16,10 @@ from select import select
 from config import Config 
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
+import matplotlib.pyplot as plt
+from pylab import title, figure, xlabel, ylabel, xticks, bar, legend, axis, savefig
+from fpdf import FPDF
 
-#baud = 9600
-#port ='/dev/tty.usbmodem00000000001A1'
-#ser = serial.Serial(port,baud)
-
-#url = "{0}:{1}".format(Config.influx_url, Config.influx_port)
-#client = InfluxDBClient(url=url, token="", database="fpv_vtx")
 
 db = None           # InfluxDB device 
 write = None        # InfluxDB write object
@@ -351,7 +348,7 @@ def run():
             print ("Please set FREQ on \tVTX to {0}Mhz Freq\n".format(freq))
             freq_id = searchBestFreqSetup(freq)
             freq_rf = "F{}".format(freq_id)
-            print ("Best frequency for ImmersionRF-Meter was set to {0}Mhz automatically".format(Config.frequencies[freq_id],freq_rf))
+            print ("Nearest frequency for ImmersionRF-Meter was set to {0}Mhz automatically".format(Config.frequencies[freq_id],freq_rf))
             print ("\nPlease set your VTX to above values - Press ENTER to start measuring")
             print("***************************************************************************")
             kb.kbWaitEnter()
