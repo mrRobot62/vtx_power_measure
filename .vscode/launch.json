@@ -1,0 +1,40 @@
+{
+   // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
+   // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
+   // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+   "version": "0.2.0",
+   "configurations": [
+      {
+         "name": "Python: Aktuelle Datei",
+         "type": "python",
+         "request": "launch",
+         "program": "${file}",
+         "console": "integratedTerminal"
+      },
+      {
+         "name": "Python: vtx.py",
+         "type": "python",
+         "request": "launch",
+         "program": "vtx.py",
+         "console": "integratedTerminal",
+         "args": [
+//            "--scan",
+            "--serial",    "/dev/tty.usbmodem00000000001A1",
+            "--url",       "http://192.168.0.251:8086",
+            "--model",     "Mini VTX5848 48CH",
+//            "--model",     "Eachine TX805",
+//            "--freq",      "5865,5845,5825,5805,5785,5765,5745,5725",
+//            "--freq",      "5865,5845,5740,5760",
+            "--freq",      "5865,5785",
+ //           "--pwr",       "25,200,600,800",
+            "--pwr",       "25,100,200",
+            "--delay",     "200",
+            "--time",      "30",
+//            "--info",      "VTX im Copter Verbaut, manuelle Pwr-Einstellung",
+            "--info",      "Teststand, manuelle Einstellungen",
+            "--influx",
+            "--csv"
+         ],
+      }   
+   ]
+}
