@@ -21,19 +21,23 @@
 //            "--scan",
             "--serial",    "/dev/tty.usbmodem00000000001A1",
             "--url",       "http://192.168.0.251:8086",
-            "--model",     "Mini VTX5848 48CH",
-//            "--model",     "Eachine TX805",
+//            "--model",     "Mini VTX5848 48CH",
+            "--model",     "",
 //            "--freq",      "5865,5845,5825,5805,5785,5765,5745,5725",
+//            "--model",     "Eachine TX805",
 //            "--freq",      "5865,5845,5740,5760",
             "--freq",      "5865,5785",
  //           "--pwr",       "25,200,600,800",
-            "--pwr",       "25,100,200",
+            "--pwr",       "25,200,500",
             "--delay",     "200",
             "--time",      "30",
 //            "--info",      "VTX im Copter Verbaut, manuelle Pwr-Einstellung",
             "--info",      "Teststand, manuelle Einstellungen",
-            "--influx",
-            "--csv"
+            "--influx",    
+            "--csv",
+// -------- create a report based on csv files ------------------------------
+//            "--load",      "./VTX_MINI_VTX_5848_20210605_15-20-03.csv",
+
          ],
       }   
    ]

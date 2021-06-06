@@ -19,7 +19,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 import matplotlib.pyplot as plt
 from pylab import title, figure, xlabel, ylabel, xticks, bar, legend, axis, savefig
 from fpdf import FPDF
-
+import seaborn as sns
 
 db = None           # InfluxDB device 
 write = None        # InfluxDB write object
@@ -30,9 +30,9 @@ parser.add_argument('-u',"--url", default="https://192.168.0.251:8086",
                     help='set URL to influxDB (https://<ip>:<port>')
 parser.add_argument('-db',"--database", default="FPV_VTX",
                     help='set database name, default is FPV_VTX')
-parser.add_argument('-m',"--model", default="unknown",
+parser.add_argument('-m',"--model", type=str, default="unknown",
                     help='set vtx model id')
-parser.add_argument('-i',"--info", default="",
+parser.add_argument('-i',"--info", type=str, default="",
                     help='set additional information for current measuring')
 parser.add_argument('-d',"--delay", default=500, type=int, 
                     help='set delay in ms between two reads')
@@ -48,6 +48,8 @@ parser.add_argument("--influx", action="store_true",
                     help='write into an InfluxDB')
 parser.add_argument("--csv", action="store_true", 
                     help='create a csv export file')
+parser.add_argument('-l',"--load", type=str,
+                    help='load an existing csv file for reporting, no measurements are done')
 
 
 
@@ -64,17 +66,25 @@ args = parser.parse_args()
 line = Config.influx_line
 row_list = []
 df = None
-print ("-----------------------------------------")
-print ("InfluxDB URL\t{}".format(args.url))
-print ("InfluxDB db \t{}".format(args.database))
-print ("Information \t{}".format(args.info))
-print ("VTX-Model   \t{}".format(args.model))
-print ("VTX-Freq    \t{}".format(args.freq))
-print ("VTX-Power   \t{}".format(args.pwr))
-print ("Read delay  \t{}".format(args.delay))
-print ("SerialPort  \t{}".format(args.serial))
-print ("")
-print (args)
+if (args.load is None):
+    print ("-----------------------------------------")
+    print ("InfluxDB URL\t{}".format(args.url))
+    print ("InfluxDB db \t{}".format(args.database))
+    print ("Information \t{}".format(args.info))
+    print ("VTX-Model   \t{}".format(args.model))
+    print ("VTX-Freq    \t{}".format(args.freq))
+    print ("VTX-Power   \t{}".format(args.pwr))
+    print ("Read delay  \t{}".format(args.delay))
+    print ("SerialPort  \t{}".format(args.serial))
+    print ("")
+    print (args)
+else:
+    print ("-------------------------------------------------------")
+    print ("Loading an existing data file to create an report")
+    print ("Import csv \t{}".format(args.load))
+    print ("")
+    print ("no writing back into influx, no csv export")
+    print ("-------------------------------------------------------")
 
 Config.serial_delay = args.delay / 1000
 
@@ -384,8 +394,43 @@ def run():
     df.to_csv(csv_fname, index=False, header=True, decimal=Config.csv_decimal, sep=Config.csv_sep,encoding="utf-8")
     print ("finished")
 
+def report(df=None, csv_files=None):
+    '''
+    create a report from dataframe
+
+    Parameter:
+    df  Dataframe with measurements. If none, load an csv file
+    csv_file CSV-File to load. If df is not none, csv parameter is ignored
+    '''
+    if (df is None) and (csv_files is not None):
+        df = pd.DataFrame()
+        list = csv_files.split(';')
+        for f in list:
+            tmp = pd.read_csv(f, sep=Config.csv_sep, decimal=Config.csv_decimal, header=0, encoding="utf-8")
+            df = df.append(tmp)
+
+        print ("Data size: \t{0}".format(df.shape))
+        print ("Data cols: \t{0}".format(df.columns))
+    else:
+        pass
+    # --------- reporting / statistic -----------------------
+
+    # group data : model / target freq / target mw
+    group_mfw = df.groupby(['Model','Target Freq','Target mW']).agg({'mW':['count','mean','min','max','std']})
+    group_mfw.colums = ['mw_count','mw_mean', 'mw_min', 'mw_max','mw_std'] 
+    group_mfw = group_mfw.reset_index()
+    print ("\n\n")
+    print ("** Stastic 1 : grouping by model/freq/power **")
+    print (group_mfw)
+    out = plt.figure()
+    bp = df.boxplot(column=['mW'], by='Model')
+    out.savefig("test.png", format="png")
+
 if __name__ == "__main__":
-    run()
+    if args.load is None:
+        run()
+    else:
+        report(None, args.load)
 
 
 #1622899155000000000
