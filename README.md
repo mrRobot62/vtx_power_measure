@@ -34,7 +34,6 @@ Now the system measures `"time"` seconds and collect data. In this case loop thr
 # Stored data
 | Attribute | csv | InfluxDB | Comment |
 |:---|:--:|:--:|:---|
-|
 | Model | x | x | Model/Type of VTX board |
 | Test | x | x | InfluxDB tag: unique timestamp for the complete run |
 | Info | x |  | only output to CSV, additional information pased on paramter --info |
@@ -65,6 +64,9 @@ Default separator is `";"` - can be adjusted inside `config.py`
 * InfluxDBClient
 * Matplotlib
 * FPDF
+
+# Developer hints
+
 
 
 # History
