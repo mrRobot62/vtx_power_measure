@@ -2,6 +2,13 @@
 
 Python script based on a pandas library. It can be used to work with an Immersion RF-Meter v2.
 
+This script is not finished at all and in an alpha-release status ;-).
+
+## Note
+This software is tested on OSX only and should be running on Linux as well. Working unter Windows is ongoing.
+
+
+
 # Immersion RF-Meter V2
 https://www.immersionrc.com/fpv-products/rfpwrv2/
 
@@ -45,6 +52,16 @@ Now the system measures `"time"` seconds and collect data. In this case loop thr
 | diff_dbm | x | x | InfluxDB field key = diff_dbm, field value = target_dbm - dbm |
 | timestamp |  | x | InfluxDB timestamp unix format in nanoseconds (ns) |
 
+# Starting parameters
+This python script do not have any graphical output, it's designed as a pure terminal script with output on console.
+
+## Arguments
+<todo>
+  
+## Examples
+<todo>
+  
+
 
 
 # InfluxDB & Grafana
@@ -66,7 +83,8 @@ Default separator is `";"` - can be adjusted inside `config.py`
 * FPDF
 
 # Developer hints
-
+<todo>
+  
 
 
 # History
