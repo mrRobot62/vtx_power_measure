@@ -18,25 +18,36 @@
          "program": "vtx.py",
          "console": "integratedTerminal",
          "args": [
+            "--demo"
 //            "--scan",
             "--serial",    "/dev/tty.usbmodem00000000001A1",
             "--url",       "http://192.168.0.251:8086",
+            "--delay",     "250",
+            "--count",     "200",
+//            "--influx",    
+            "--csv",
+
 //            "--model",     "Mini VTX5848 48CH",
-            "--model",     "",
-//            "--freq",      "5865,5845,5825,5805,5785,5765,5745,5725",
 //            "--model",     "Eachine TX805",
-//            "--freq",      "5865,5845,5740,5760",
-            "--freq",      "5865,5785",
- //           "--pwr",       "25,200,600,800",
-            "--pwr",       "25,200,500",
-            "--delay",     "200",
-            "--time",      "30",
+//            "--model",     "Immersion Furios VPV VTX V2",
+            "--model",     "DEMO_MODE",
 //            "--info",      "VTX im Copter Verbaut, manuelle Pwr-Einstellung",
             "--info",      "Teststand, manuelle Einstellungen",
-            "--influx",    
-            "--csv",
-// -------- create a report based on csv files ------------------------------
+
+            "--vtx",        "betaflight_vtx/vtxtab_MiniVTX5848_25-100-200.json",
 //            "--load",      "./VTX_MINI_VTX_5848_20210605_15-20-03.csv",
+//            "--load",      "./VTX_AKK_K31_40_CH_600_MW_20210609_22-05-42.csv"
+ 
+//               "--bands",  "A",
+            "--band",  "A",
+//            "--channels",      "5865,5845,5825,5805,5785,5765,5745,5725",
+//            "--channels",      "5865,5845,5740,5760",
+//            "--channels",      "5865",
+            "--channels",      "5865,5845",
+
+//           "--power",       "25,200,600,800",
+            "--power",       "25",
+ // -------- create a report based on csv files ------------------------------
 
          ],
       }   

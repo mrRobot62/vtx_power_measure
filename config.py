@@ -32,9 +32,9 @@ class Config(object):
    influx_db = "FPV_VTX"
    influx_org = "LunaX"
    influx_measurement = "vtx"
-   influx_line = "{0},test={1},model={2},t_freq={3},t_mW={4:0.2f},t_dBm={5:0.2f} mW={6:0.2f},dBm={7:0.2f},dif_mW={8:0.2f},dif_dBm={9:0.2f} {10}"
-   df_header = ["TS","Test","Model","Target Freq","Target mW","Target dBm","Info","mW","dBm","dif_mW","dif_dBm"]
-   csv_line = "{0};{1};{2};{3};{4:0.2f};{5:0.2f};{6},{7:0.2f};{8:0.2f};{9:0.2f};{10:0.2f}"
+   influx_line = "{0},test={1},model={2},t_band={3},t_freq={4},t_mW={5:0.2f},t_dBm={6:0.2f} mW={7:0.2f},dBm={8:0.2f},dif_mW={9:0.2f},dif_dBm={10:0.2f} {11}"
+   df_header = ["TS","Test","Model","Target Band", "Target Freq","Target mW","Target dBm","Info","mW","dBm","dif_mW","dif_dBm"]
+   csv_line = "{0};{1};{2};{3};{4};{5:0.2f};{6:0.2f};{7},{8:0.2f};{9:0.2f};{10:0.2f};{11:0.2f}"
    csv_fname = "VTX_{0}_{1}.csv"
    csv_sep = ";"
    csv_decimal = ","
