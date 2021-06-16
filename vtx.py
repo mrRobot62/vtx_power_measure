@@ -5,6 +5,7 @@ import argparse
 import re
 import json
 import random
+import string
 from time import sleep
 import datetime, time
 from timeit import default_timer as timer
@@ -35,7 +36,7 @@ parser = argparse.ArgumentParser(description='VTX-Measurements')
 # -l : load an existing csv result file and do some statistics
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('-v',"--vtx", type=str, help='set betaflight vtx table (JSON-File)')
-group.add_argument('-l',"--load", type=str, help='load an existing csv file for reporting, no measurements are done')
+#group.add_argument('-l',"--load", type=str, help='load an existing csv file for reporting, no measurements are done')
 
 
 # if set, than only this frequencies are used
@@ -170,16 +171,60 @@ if args.vtx:
     #print (args)
     print ("-------------------------------------------------------")
 
-else:
-    print ("-------------------------------------------------------")
-    print ("Loading an existing data file to create an report")
-    print ("Import csv \t{}".format(args.load))
-    print ("")
-    print ("no writing back into influx, no csv export")
-    print ("-------------------------------------------------------")
-
  
 Config.serial_delay = args.delay / 1000
+
+vtx_rnd = None
+
+class VTX_Randomize:
+    dbmDriftMin = 0.0
+    dbmDriftMax = 0.0
+    basedBm = 0.0
+    basemW = 0.0
+    def __init__(self):
+        pass
+
+    def dbm2mw(self, dBm):
+        dBm = float(dBm)
+        return 10**((dBm)/10.)
+
+    def mw2dBm(self, mW):
+        mW = float(mW)
+        return 10.*log10(mW)
+
+    def setdBmDrift(self):
+        ''' 
+        calculate a drifting of an output power. set a min and a max value
+        Is used by getRndmW() and getRnddBm()
+        '''
+        d1 = round(random.uniform(0, 2.0),3)
+        d2 = round(random.uniform(0, 1.0),3)
+        self.dbmDriftMin = d2
+        self.dbmDriftMax = d1
+        if (d2 < d1):
+            self.dbmDriftMin = d2
+            self.dbmDriftMax = d1
+
+    def getdBmDrift(self):
+        return (self.dbmDriftMin, self.dbmDriftMax)
+
+    def setdBm(self, dbm):
+#        self.basedBm = dbm + round(random.uniform(-3.0, 3.0),2)
+        self.basedBm = dbm
+        self.basemW = self.dbm2mw(self.basedBm)
+
+    def getRndmW(self):
+        ''' return a randomize mW based on basemW'''
+        return self.dbm2mw(self.getRnddBm())
+        
+
+    def getRnddBm(self):
+        ''' return a randomize dBm based on basedBm'''
+        dbm = self.basedBm 
+        dbm = round(random.uniform(dbm - self.dbmDriftMin, dbm + self.dbmDriftMax),4)
+        return dbm
+
+    
 
 class KBHit:
 
@@ -379,7 +424,7 @@ def WriteTo(write_api, measurement, tag_model, tag_band, tag_freq, tag_pwr, fiel
 
     row_list.append(dict(zip(Config.df_header, l)))
     line = Config.influx_line.format(Config.influx_measurement, test_ts, tag_model, tag_band, tag_freq, tag_pwr, tag_dbm, field_mw, field_dbm,d1,d2, ts)
-    print ("WRITE: {0} \t{1}".format(ms,line))
+    #print ("WRITE: {0} \t{1}".format(ms,line))
 
     if args.influx:
         if (field_dbm > 0.0):
@@ -388,24 +433,35 @@ def WriteTo(write_api, measurement, tag_model, tag_band, tag_freq, tag_pwr, fiel
             print ("{0} no writing into db \t{1}".format(ms,line))
 
 
-def SendImmersionRF(parameter):
+def SendImmersionRF(parameter, value=None):
     '''
     send parameter to Immersion RF meter and return restult form device
+
+    parameter   see Config file. e.g. "d" (for avg), "f" to set freq, ...
+    value       is needed if parameter is "f" than value is Frequency-ID
     '''
+    global vtx_rnd
     if args.demo:
         # Immersion RF-Meter returns values in dBm
         # 14 dBm = 25mW
-        return round(random.uniform(13.0, 15.0),3)
+        dBm = vtx_rnd.getRnddBm()
+        return round(dBm,2)
+    #
+    # prepare command
+    if parameter[0].lower() == Config.immersion_parameters["freq"]:
+        cmd = str.encode("{0}{1}\r".format(parameter,value))
+    else:
+        cmd = str.encode("{0}\r".format(parameter))
 
-    ser.write(str.encode("{}\r".format(parameter)))
+    ser.write(cmd)
     ser.flush()
     sleep(0.1)
     bytesToRead = ser.inWaiting()
     v = ser.read(bytesToRead)
     if (parameter.lower() == Config.immersion_parameters["version"]):
-        return v
+        return v.decode()
     if (parameter[0].lower() == Config.immersion_parameters["freq"]):
-        return v
+        return v.decode()
     if (parameter == Config.immersion_parameters["avg"] or parameter == Config.immersion_parameters["peak"]):
         result = re.findall(r"[-+]?\d*\.\d+|\d+", v.decode('utf-8'))
     return float(result[0])
@@ -436,15 +492,16 @@ def searchBestFreqSetup(freq):
 
 
 def run():
-    global line, row_list, df
+    global line, row_list, df, vtx_rnd
     ms = datetime.datetime.now()
     id = int(time.mktime(ms.timetuple()))
     test_ts = ms.strftime("%Y%m%d") + "_" + str(id)
 
     bf_vtx = BF_VTX_Table(args.vtx)
-    #band = bf_vtx.getBand('A')
-    #band = bf_vtx.getBand('B')
-    #band = bf_vtx.getBand('X')
+
+    if args.demo:
+        letters = string.ascii_uppercase
+        args.model = args.model + ''.join(random.choice(letters) for i in range(5))
 
     if args.power:
         pwr_list = args.power.split(',')
@@ -467,7 +524,7 @@ def run():
         InitSerial()
         print ("initialize Immersion RF-Meter...")
         sleep(3.0)
-        result = SendImmersionRF('v')
+        result = SendImmersionRF(Config.immersion_parameters["version"])
         print ("Immersion RF-Meter version: {}".format(result))
 
     if args.influx:
@@ -481,16 +538,25 @@ def run():
     cnt = 0
     print("\n\n---- START ----\n")
     all_s = timer()
-    for pwr in pwr_list:
-        pwr = int(pwr)  # if set via parameter list is a string list
+    vtx_rnd = VTX_Randomize()
+    for t_pwr in pwr_list:
+        t_pwr = int(t_pwr)  # if set via parameter list is a string list
         print ("--------------------------------")
         print ("\tSet VTX-power")
         print ("--------------------------------")
         print ("Measuring this bands: \t{0}".format(band_list))
-        print ("\nSet your VTX to => {0}mW and press ENTER".format(pwr))
-        kb.kbWaitEnter()
+        print ("\nSet your VTX to => {0}mW and press ENTER".format(t_pwr))
+        if args.demo:
+            vtx_rnd.setdBm(mW2dBm(t_pwr))
+#            t_pwr = round(dBm2mW(vtx_rnd.getdBm()),1)
+        if not args.demo:
+            kb.kbWaitEnter()
+        else:
+            sleep(Config.demo_enter_wait)
 
         for band in band_list:
+            if args.demo:
+                vtx_rnd.setdBmDrift()
             if args.channels:
                 # please note: if you use channels via parameter
                 # check if this frequencies are available for given band
@@ -502,31 +568,44 @@ def run():
             print ("--------------------------------")
             print ("Measuring this channels: \t{0}".format(channel_list))
             print ("\nSet your VTX to => BAND: {0} and press ENTER".format(band))
-            kb.kbWaitEnter()
+            if not args.demo:
+                kb.kbWaitEnter()
+            else:
+                sleep(Config.demo_enter_wait)
             channel_id = 1
             for channel in channel_list:
-                channel = channel.strip()
+                if (type(channel)==str):
+                    channel = channel.strip()
+                nearestFreq4RFMeterID = searchBestFreqSetup(channel)
+                result = SendImmersionRF(Config.immersion_parameters["freq"], nearestFreq4RFMeterID)
                 print ("\n--------------------------------")
                 print ("\tSet VTX-channel")
                 print ("--------------------------------")
-                print ("\nSet your VTX to => Band {0} and Channel({1}): {2} and press ENTER".format(band, channel_id, channel))
-                kb.kbWaitEnter()
-                result = SendImmersionRF(channel)
+                print ("\nSet your VTX to => Band {0} and Channel({1}): {2}".format(band, channel_id, channel))
+                print ("Nearest frequence for Immersion RF-Meter  {0} => Result ImmersionRF: {1}".format(Config.frequencies[nearestFreq4RFMeterID], result))
+                print ("Press ENTER if done")
+                if not args.demo:
+                    kb.kbWaitEnter()
+                else:
+                    sleep(Config.demo_enter_wait)
+                    
                 cnt = 0
                 chnl_s = timer()
+                row_list=[]
                 while cnt < args.count:
-                    result = float(SendImmersionRF(args.param))
+                    dBm = float(SendImmersionRF(args.param))
+                    mW = dBm2mW(dBm)
                     cnt = cnt + 1
                     WriteTo(writer, 
                         Config.influx_measurement,
                         args.model,
                         band,
                         int(channel),
-                        float(pwr),
-                        result, 
+                        float(t_pwr),
+                        dBm, 
                         test_ts
                     )
-                    print ("{0:03d}\tPower {1:#3d}mW, Band {2}, Channel({3}) {4}Mhz ".format(cnt, pwr,band,channel_id, channel))
+                    print ("{0:03d}\tPower {1:#4.1f}mW / {5:#3.2f}dBm, Band {2}, Channel({3}) {4}Mhz ".format(cnt, mW,band,channel_id, channel, dBm))
                     sleep(Config.serial_delay)
 
                 chnl_e = timer() - chnl_s
@@ -542,70 +621,27 @@ def run():
     print ("-----------------------------------------------")
     print ("Overall measuring timing\t{0}".format(str(datetime.timedelta(seconds=all_e))))
     print ("-----------------------------------------------")
-    '''
-    for freq in freq_list:
-        row_list = []
-        f_timer = timer()
-        #
-        # iterate through all frequencies
-        for pwr in pwr_list:
-            print("\n***************************************************************************")
-            print ("Please set POWER on \tVTX to {0}mW".format(pwr))
-            print ("Please set FREQ on \tVTX to {0}Mhz Freq\n".format(freq))
-            freq_id = searchBestFreqSetup(freq)
-            freq_rf = "F{}".format(freq_id)
-            print ("Nearest frequency for ImmersionRF-Meter was set to {0}Mhz automatically".format(Config.frequencies[freq_id],freq_rf))
-            print ("\nPlease set your VTX to above values - Press ENTER to start measuring")
-            print("***************************************************************************")
-            kb.kbWaitEnter()
-            result = SendImmersionRF(freq_rf)
-            timeout = False
-            counter = 0
-            p_timer = timer()
-            #
-            # do as many measurements for current power and frequence as configured via parameter
-            #
-            while counter <= args.count:
-                # prepare for kind of measurement (avg or peak)
-                result = SendImmersionRF(args.param)
-                #print ("{0:5f}\t{1}".format(elapsed, result))
-                WriteTo(writer, 
-                    Config.influx_measurement,
-                    args.model,
-                    int(freq),
-                    float(pwr),
-                    result, 
-                    test_ts
-                )
-                counter = counter + 1
-                sleep(Config.serial_delay)    
-                print("{2:04d} --- measuring for {0}mW on {1}Mhz done  ---".format(float(pwr),int(freq), counter ))
-                pass #while
-            
-            e_timer = timer() - p_timer
-            df = df.append(row_list,ignore_index=True)
-            print (">>> mW measuring finished in {}seconds".format(e_timer))
-
-            pass # for pwr_list
-
-        e_timer = timer() - f_timer        
-        print ("finished in {}seconds".format(e_timer))
-    print ("*******************************************")
-    print ("*       all power measurements done       *")
-    print ("*******************************************")
-    '''
     #
     # create a csv for this measurments
     if (args.csv):
         now = datetime.datetime.now()
         ts = now.strftime("%Y%m%d_%H-%M-%S")
         model = args.model.replace(" ","_").upper()
-        csv_fname = Config.csv_fname.format(model,ts)
+        csv_fname = Config.csv["fname"].format(model,ts)
         if args.demo:
             csv_fname = "DEMO_" + csv_fname
         print ("creating csv export file {0}".format(csv_fname))
-        df.to_csv(csv_fname, index=False, header=True, decimal=Config.csv_decimal, sep=Config.csv_sep,encoding="utf-8")
+        csv_fname = Config.csv['path'] + csv_fname
+        df.to_csv(csv_fname, index=False, header=True, decimal=Config.csv['decimal'], sep=Config.csv['sep'],encoding="utf-8")
         print ("finished")
+
+    # group data : model / target freq / target mw
+    group_mfw = df.groupby(['Model','Target Band','Target Freq','Target mW']).agg({'mW':['count','mean', 'min','max','std']},{'dBm':['mean']})
+    group_mfw.colums = ['mw_count','dBm_mean','mw_mean', 'mw_min', 'mw_max','mw_std'] 
+    group_mfw = group_mfw.reset_index()
+    print ("\n\n")
+    print ("** Stastic 1 : grouping by model/freq/power **")
+    print (group_mfw)
 
 
 def report(df=None, csv_files=None):
@@ -620,7 +656,7 @@ def report(df=None, csv_files=None):
         df = pd.DataFrame()
         list = csv_files.split(';')
         for f in list:
-            tmp = pd.read_csv(f, sep=Config.csv_sep, decimal=Config.csv_decimal, header=0, encoding="utf-8")
+            tmp = pd.read_csv(f, sep=Config.csv['sep'], decimal=Config.Config.csv['decimal'], header=0, encoding="utf-8")
             df = df.append(tmp)
 
         print ("Data size: \t{0}".format(df.shape))
@@ -641,10 +677,10 @@ def report(df=None, csv_files=None):
     #out.savefig("test.png", format="png")
 
 if __name__ == "__main__":
-    if args.load is None:
-        run()
-    else:
-        report(None, args.load)
+#    if args.load is None:
+    run()
+#    else:
+#        report(None, args.load)
 
 
 #1622899155000000000

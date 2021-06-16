@@ -43,6 +43,7 @@ Now the system measures `"time"` seconds and collect data. In this case loop thr
 |:---|:--:|:--:|:---|
 | Model | x | x | Model/Type of VTX board |
 | Test | x | x | InfluxDB tag: unique timestamp for the complete run |
+| Band | x | x | InfluxDB tag: VTX Band (like A, B, H, I, R, ...) |
 | Info | x |  | only output to CSV, additional information pased on paramter --info |
 | t_mw | x | x | InfluxDB tag: target mw (e.g. 25mW, 100mW, 200mW, ...) |
 | t_dbm | x | x | InfluxDB tag: target mBm (e.g. 14.0 dBm, ...) |
