@@ -7,7 +7,7 @@ This script is not finished at all and in an alpha-release status ;-).
 ## Note
 This software is tested on OSX only and should be running on Linux as well. Working unter Windows is ongoing.
 
-> It's a quick & dirty implementation to compare several vtx boards on my workbench - and what should I say - at least every cheap China-VTX don't have the output strength as measured from supplierer. I tested around 10-12 different VTX boards no cheap board with 800mW was able to send this strength
+> This is a quick & dirty implementation to compare different VTX boards on my workbench - and what can I say - none of the cheap Banggood / AliExpress China VTX boards came close to the manufacturer's stated maximum output power. <br> Most 800mW VTX delivered on average between 500-650mw. I tested about 10-12 different VTX boards. <br><br>**Buy cheap, buy twice**
 
 **In comparision to a TBS-Sixty9 vtx no China crap comes into the range of TBS !**
 
