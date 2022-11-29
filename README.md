@@ -1,8 +1,8 @@
 # VTX power measurment tool
 
-Python script based on a pandas library. It can be used to work with an Immersion RF-Meter v2.
+Terminal based python script based on a pandas library. It can be used to read an Immersion RF-Meter v2 via USB.
 
-This script is not finished at all and in an alpha-release status ;-).
+This script is not finished at all and in an alpha-release status ;-). But it works for my needs.
 
 ## Note
 This software is tested on OSX only and should be running on Linux as well. Working unter Windows is ongoing.
