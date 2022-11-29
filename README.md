@@ -7,7 +7,9 @@ This script is not finished at all and in an alpha-release status ;-).
 ## Note
 This software is tested on OSX only and should be running on Linux as well. Working unter Windows is ongoing.
 
+> It's a quick & dirty implementation to compare several vtx boards on my workbench - and what should I say - at least every cheap China-VTX don't have the output strength as measured from supplierer. I tested around 10-12 different VTX boards no cheap board with 800mW was able to send this strength
 
+**In comparision to a TBS-Sixty9 vtx no China crap comes into the range of TBS !**
 
 # Immersion RF-Meter V2
 https://www.immersionrc.com/fpv-products/rfpwrv2/
